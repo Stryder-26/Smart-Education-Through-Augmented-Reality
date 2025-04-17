@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DNA & Pelton AR</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100%;
+      background: transparent;
+    }
+
+    #startScreen, #arScreen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      font-family: sans-serif;
+    }
+
+    #startScreen {
+      background: white;
+      color: black;
+      z-index: 5;
+    }
+
+    #arScreen {
+      display: none;
+      background: transparent;
+      z-index: 1;
+    }
+
+    button {
+      padding: 15px 30px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      background-color: #00aaff;
+      color: white;
+      cursor: pointer;
+      z-index: 10;
+      margin: 5px;
+    }
+
+    .control-buttons {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+    }
+
+    #statusText {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      padding: 8px 20px;
+      border-radius: 10px;
+      font-size: 18px;
+      z-index: 20;
+      display: none;
+    }
+  </style>
+
+  <!-- A-Frame and AR.js -->
+  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.3.2/aframe/build/aframe-ar-nft.js"></script>
+</head>
+<body>
+
+  <!-- Start Screen -->
+  <div id="startScreen">
+    <h1>Welcome to the AR Experience</h1>
+    <p>Click below to scan your target image</p>
+    <button onclick="startAR()">Scan Target Image</button>
+  </div>
+
+  <!-- AR Screen -->
+  <div id="arScreen">
+    <a-scene
+      embedded
+      renderer="alpha: true; antialias: true; precision: mediump;"
+      arjs="sourceType: webcam; trackingMethod: best; debugUIEnabled: false; smoothMode: 1;"
+      vr-mode-ui="enabled: false"
+      device-orientation-permission-ui="enabled: true"
+      style="width: 100%; height: 100%; background: transparent;">
+
+      <!-- Assets -->
+      <a-assets>
+        <a-asset-item id="dnaModel" src="dna.glb"></a-asset-item>
+        <a-asset-item id="peltonModel" src="water_turbine_wheel.glb"></a-asset-item>
+        <a-asset-item id="motherboardModel" src="motherboard.glb"></a-asset-item>
+        <a-asset-item id="jetEngineModel" src="jet_engine.glb"></a-asset-item>
+        <a-asset-item id="earthModel" src="earth.glb"></a-asset-item>
+        <a-asset-item id="nasaModel" src="nasa.glb"></a-asset-item>
+        <a-asset-item id="voyagerModel" src="voyager_space_satellite.glb"></a-asset-item>
+        <a-asset-item id="skeletonModel" src="standing_skeleton.glb"></a-asset-item>
+        <a-asset-item id="animalCellModel" src="animal_cell.glb"></a-asset-item>
+      </a-assets>
+
+      <!-- Markers and Entities -->
+      <a-marker preset="hiro" id="hiroMarker">
+        <a-entity id="dnaEntity" gltf-model="#dnaModel" scale="0.4 0.4 0.4" position="0 0 0"></a-entity>
+      </a-marker>
+
+      <a-marker preset="kanji" id="kanjiMarker">
+        <a-entity id="peltonEntity" gltf-model="#peltonModel" scale="0.5 0.5 0.5" position="0 0 0"></a-entity>
+      </a-marker>
+
+      <a-marker type="pattern" url="pattern-arjs.patt" id="motherboardMarker">
+        <a-entity id="motherboardEntity" gltf-model="#motherboardModel" scale="2.5 2.5 2.5" position="0 0 0"></a-entity>
+      </a-marker>
+
+      <a-marker type="pattern" url="pattern-letterA.patt" id="jetEngineMarker">
+        <a-entity id="jetEngineEntity" gltf-model="#jetEngineModel" scale="2.5 2.5 2.5" position="0 0 0"></a-entity>
+      </a-marker>
+
+      <a-marker type="pattern" url="pattern-letterB.patt" id="animalCellMarker">
+        <a-entity id="animalCellEntity" gltf-model="#animalCellModel" scale="0.25 0.25 0.25" position="0 0 0" rotation="0 0 180"></a-entity>
+      </a-marker>
+
+      <a-marker type="pattern" url="letterG.patt" id="earthMarker">
+        <a-entity id="earthEntity" gltf-model="#earthModel" scale="15.0 15.0 15.0" position="0 0 0"></a-entity>
+      </a-marker>
+
+      <a-marker type="pattern" url="letterF.patt" id="nasaMarker">
+        <a-entity id="nasaEntity" gltf-model="#nasaModel" scale="2.5 2.5 2.5" position="0 0 0"></a-entity>
+      </a-marker>
+
+      <a-marker type="pattern" url="letterD.patt" id="voyagerMarker">
+        <a-entity id="voyagerEntity" gltf-model="#voyagerModel" scale="0.5 0.5 0.5" position="0 0 0"></a-entity>
+      </a-marker>
+
+      <a-marker type="pattern" url="letterC.patt" id="skeletonMarker">
+        <a-entity id="skeletonEntity" gltf-model="#skeletonModel" scale="2 2 2" position="0 0 0"></a-entity>
+      </a-marker>
+
+      <a-entity camera></a-entity>
+    </a-scene>
+
+    <div id="statusText"></div>
+
+    <div class="control-buttons">
+      <button onclick="rotateModels()">🔁 Rotate Models</button>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    let rotation = 0;
+    let rotating = false;
+    let statusEl;
+
+    let markers = {};
+    let entities = {};
+    let animalCellRotation = 0; // Specific rotation for animalCell
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const markerIds = [
+        'hiro', 'kanji', 'motherboard', 'jetEngine',
+        'earth', 'nasa', 'voyager', 'skeleton', 'animalCell'
+      ];
+
+      const entityIds = {
+        hiro: 'dnaEntity',
+        kanji: 'peltonEntity',
+        motherboard: 'motherboardEntity',
+        jetEngine: 'jetEngineEntity',
+        earth: 'earthEntity',
+        nasa: 'nasaEntity',
+        voyager: 'voyagerEntity',
+        skeleton: 'skeletonEntity',
+        animalCell: 'animalCellEntity'
+      };
+
+      markerIds.forEach(id => {
+        markers[id] = document.querySelector(`#${id}Marker`);
+        entities[id] = document.getElementById(entityIds[id]);
+      });
+
+      statusEl = document.getElementById('statusText');
+      animateRotation();
+    });
+
+    function animateRotation() {
+      requestAnimationFrame(animateRotation);
+
+      if (!rotating) {
+        let statusText = [];
+        let anyVisible = false;
+
+        for (const key in markers) {
+          if (markers[key]?.object3D?.visible) {
+            if (key !== 'animalCell') { // Exclude Animal Cell from auto-rotation
+              rotation += 0.5;
+              entities[key].setAttribute('rotation', `0 ${rotation} 0`);
+            }
+
+            // For animalCell, manually rotate only when the button is pressed
+            if (key === 'animalCell' && rotating) {
+              animalCellRotation += 45; // Manual rotation for animalCell
+              entities[key].setAttribute('rotation', `0 ${animalCellRotation} 0`);
+            }
+
+            statusText.push(`${markerLabel(key)} Marker Detected`);
+            anyVisible = true;
+          }
+        }
+
+        statusEl.style.display = anyVisible ? 'block' : 'none';
+        statusEl.textContent = statusText.join(' | ');
+      }
+    }
+
+    function rotateModels() {
+      rotating = true; // Set rotating flag to true when the manual rotate button is pressed
+
+      // Apply manual rotation to all models
+      for (const key in markers) {
+        if (markers[key]?.object3D?.visible) {
+          if (key !== 'animalCell') {
+            rotation += 45; // Apply manual rotation to all except animalCell
+            entities[key].setAttribute('rotation', `0 ${rotation} 0`);
+          } else {
+            animalCellRotation += 45; // Apply manual rotation to animalCell
+            entities[key].setAttribute('rotation', `0 ${animalCellRotation} 0`);
+          }
+        }
+      }
+      
+      setTimeout(() => rotating = false, 100); // Reset rotation flag after a brief delay
+    }
+
+    function startAR() {
+      document.getElementById('startScreen').style.display = 'none';
+      document.getElementById('arScreen').style.display = 'block';
+      console.log("✅ AR started");
+    }
+
+    function markerLabel(key) {
+      const labels = {
+        hiro: '🧬 DNA',
+        kanji: '💧 Pelton',
+        motherboard: '💻 Motherboard',
+        jetEngine: '✈️ Jet Engine',
+        earth: '🌍 Earth',
+        nasa: '🚀 NASA',
+        voyager: '🛰️ Voyager',
+        skeleton: '💀 Skeleton',
+        animalCell: '🧫 Animal Cell'
+      };
+      return labels[key] || key;
+    }
+  </script>
+</body>
+</html>
