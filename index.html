@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>DNA & Pelton AR</title>
   <style>
     html, body {
@@ -202,12 +201,14 @@
 
         for (const key in markers) {
           if (markers[key]?.object3D?.visible) {
-            if (key !== 'animalCell') {
+            if (key !== 'animalCell') { // Exclude Animal Cell from auto-rotation
               rotation += 0.5;
               entities[key].setAttribute('rotation', `0 ${rotation} 0`);
             }
+
+            // For animalCell, manually rotate only when the button is pressed
             if (key === 'animalCell' && rotating) {
-              animalCellRotation += 45;
+              animalCellRotation += 45; // Manual rotation for animalCell
               entities[key].setAttribute('rotation', `0 ${animalCellRotation} 0`);
             }
 
@@ -222,42 +223,25 @@
     }
 
     function rotateModels() {
-      rotating = true;
+      rotating = true; // Set rotating flag to true when the manual rotate button is pressed
 
+      // Apply manual rotation to all models
       for (const key in markers) {
         if (markers[key]?.object3D?.visible) {
           if (key !== 'animalCell') {
-            rotation += 45;
+            rotation += 45; // Apply manual rotation to all except animalCell
             entities[key].setAttribute('rotation', `0 ${rotation} 0`);
           } else {
-            animalCellRotation += 45;
+            animalCellRotation += 45; // Apply manual rotation to animalCell
             entities[key].setAttribute('rotation', `0 ${animalCellRotation} 0`);
           }
         }
       }
-
-      setTimeout(() => rotating = false, 100);
+      
+      setTimeout(() => rotating = false, 100); // Reset rotation flag after a brief delay
     }
 
-    // Updated startAR function for mobile compatibility
     function startAR() {
-      if (typeof DeviceOrientationEvent !== 'undefined' &&
-          typeof DeviceOrientationEvent.requestPermission === 'function') {
-        DeviceOrientationEvent.requestPermission()
-          .then(permissionState => {
-            if (permissionState === 'granted') {
-              enableAR();
-            } else {
-              alert("Permission denied. Cannot start AR.");
-            }
-          })
-          .catch(console.error);
-      } else {
-        enableAR(); // For Android or older iOS
-      }
-    }
-
-    function enableAR() {
       document.getElementById('startScreen').style.display = 'none';
       document.getElementById('arScreen').style.display = 'block';
       console.log("✅ AR started");
